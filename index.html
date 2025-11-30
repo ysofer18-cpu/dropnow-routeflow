@@ -4,6 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DROP NOW – סידור מסלול לשליחים (נסיעת רכב)</title>
+
+  <!-- PWA -->
+  <meta name="theme-color" content="#0066cc">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icon-192.png">
+
   <style>
     :root {
       --primary:#0066cc;
@@ -147,13 +153,13 @@
     <div>
       <h2>DROP NOW – סידור מסלול לשליחים</h2>
       <div class="app-subtitle">
-        הגרסה הזו מחשבת <strong>מסלול יום מלא</strong> שמתחיל ומסתיים באותה נקודה (מחסן / בית).<br>
-        Google מסדר את כל העצירות כדי למזער את זמן הנסיעה הכולל.
+        גרסת PWA – אפשר להתקין כמסך בית בטלפון.<br>
+        מסלול סגור: יציאה מנקודת בסיס וחזרה אליה, עם סידור אוטומטי של כל העצירות באמצע.
       </div>
     </div>
   </div>
 
-  <p class="hint">הקלד נקודת יציאה / חזרה (מחסן / בית) ורשימת נקודות למסירה – המערכת תחשב מסלול סגור אופטימלי.</p>
+  <p class="hint">הקלד נקודת יציאה/חזרה (מחסן / בית) ורשימת נקודות למסירה – המערכת תחשב מסלול סגור אופטימלי לפי זמן נסיעה.</p>
 
   <label>נקודת יציאה וחזרה (חובה)</label>
   <input id="start" placeholder="לדוגמה: הדרוף הנחלים 13, חולון">
@@ -189,7 +195,9 @@
   <div id="results"></div>
 </div>
 
+<!-- Google Maps + Places -->
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAFcjjQ8OuE28K3SYA-aQe2hm04Gsru7Fk&libraries=places"></script>
+<!-- קובץ EXCEL -->
 <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
 
 <script>
@@ -216,6 +224,13 @@
     );
 
     updateCounter();
+
+    // רישום Service Worker ל-PWA
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("sw.js").catch(function(e){
+        console.log("SW registration failed:", e);
+      });
+    }
   };
 
   function addPoint() {
@@ -373,7 +388,6 @@
         const legs = route.legs;
         const order = route.waypoint_order || [];
 
-        // נקודות במסלול לפי סדר אמיתי: התחלה -> waypoints בסדר אופטימלי -> חזרה להתחלה
         let fullStops = [];
         fullStops.push({ name: origin, isStart: true, leg: null });
 
@@ -381,7 +395,6 @@
           fullStops.push({ name: stops[order[i]], isStart: false, leg: legs[i] });
         }
 
-        // leg האחרון מחזיר מהנקודה האחרונה בחישוב חזרה להתרוג
         fullStops.push({
           name: origin,
           isStart: false,
