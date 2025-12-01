@@ -1,211 +1,489 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DROP NOW – סידור מסלול לשליחים (נסיעת רכב)</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DROP NOW – RouteFlow</title>
+  <meta name="theme-color" content="#0b51c5" />
 
-  <!-- PWA -->
-  <meta name="theme-color" content="#0066cc">
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="icon" href="assets/logo.jpg" />
 
   <style>
     :root {
-      --primary:#0066cc;
-      --primary-dark:#004c99;
-      --accent:#34a853;
+      --primary:#0b51c5;
+      --primary-soft:#e3edff;
+      --primary-dark:#063b8f;
       --bg:#f3f4f6;
       --card:#ffffff;
-      --text:#111827;
+      --border:#e5e7eb;
+      --text:#0f172a;
       --muted:#6b7280;
+      --danger:#e11d48;
     }
-    * { box-sizing:border-box; }
-    body {
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
-      background:radial-gradient(circle at top left,#e0f2fe,#f3f4f6);
-      padding:20px;
+    *{box-sizing:border-box;}
+    html,body{
       margin:0;
+      padding:0;
+      height:100%;
+      font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Arial,sans-serif;
+      background:var(--bg);
       color:var(--text);
     }
-    .box{
-      background:var(--card);
-      padding:24px;
-      max-width:960px;
-      margin:auto;
-      border-radius:16px;
-      box-shadow:0 18px 45px rgba(15,23,42,0.12);
-      border:1px solid rgba(148,163,184,0.25);
+    body{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:16px;
     }
-    h2{margin:0;font-size:1.6rem;}
-    label{display:block;margin-top:12px;margin-bottom:4px;font-weight:600;}
-    input,button{
+    .app-shell{
       width:100%;
-      padding:10px 12px;
-      margin:6px 0;
-      font-size:1rem;
+      max-width:460px;
+      height:100%;
+      max-height:880px;
+      border-radius:28px;
+      padding:16px;
+      background:#ffffff;
+      box-shadow:
+        0 18px 45px rgba(15,23,42,0.18),
+        0 0 0 1px rgba(148,163,184,0.35);
+      position:relative;
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+    }
+    @media (max-width:600px){
+      body{padding:0;}
+      .app-shell{
+        max-width:none;
+        max-height:none;
+        width:100%;
+        height:100%;
+        border-radius:0;
+        box-shadow:none;
+      }
+    }
+    .status-bar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      font-size:0.7rem;
+      color:var(--muted);
+      opacity:0.9;
+      margin-bottom:6px;
+    }
+    .app-header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      margin-bottom:10px;
+    }
+    .app-header-main{
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+    .logo-pill{
+      width:42px;
+      height:42px;
+      border-radius:14px;
+      background:#ffffff;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      box-shadow:0 8px 18px rgba(15,23,42,0.15);
+      padding:4px;
+    }
+    .logo-pill img{
+      max-width:100%;
+      max-height:100%;
+      object-fit:contain;
+    }
+    .app-title{
+      display:flex;
+      flex-direction:column;
+      gap:2px;
+    }
+    .app-title-main{
+      font-weight:800;
+      font-size:1.1rem;
+      letter-spacing:0.06em;
+      text-transform:uppercase;
+      color:var(--primary-dark);
+    }
+    .app-title-sub{
+      font-size:0.75rem;
+      color:var(--muted);
+    }
+    .app-badge{
+      font-size:0.7rem;
+      padding:4px 10px;
+      border-radius:999px;
+      background:var(--primary-soft);
+      border:1px solid rgba(37,99,235,0.28);
+      color:var(--primary-dark);
+      display:flex;
+      align-items:center;
+      gap:6px;
+    }
+    .app-badge-dot{
+      width:7px;
+      height:7px;
+      border-radius:999px;
+      background:#22c55e;
+      box-shadow:0 0 0 3px rgba(34,197,94,0.25);
+    }
+    .screen{
+      flex:1;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      overflow:hidden;
+    }
+    .card{
+      background:var(--card);
+      border-radius:18px;
+      padding:14px 14px 12px;
+      border:1px solid var(--border);
+    }
+    .card-header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      margin-bottom:6px;
+    }
+    .card-title-wrap{
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+    .card-icon{
+      width:22px;
+      height:22px;
+      border-radius:999px;
+      background:var(--primary-soft);
+      color:var(--primary-dark);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:0.9rem;
+    }
+    .card-title{
+      font-size:0.86rem;
+      font-weight:600;
+    }
+    .card-subtitle{
+      font-size:0.72rem;
+      color:var(--muted);
+    }
+    .pill{
+      font-size:0.7rem;
+      padding:4px 9px;
+      border-radius:999px;
+      background:#eff6ff;
+      border:1px solid:#bfdbfe;
+      color:#1d4ed8;
+    }
+    .field-label{
+      font-size:0.7rem;
+      color:var(--muted);
+      margin-bottom:3px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+    }
+    .field-label span:first-child{
+      font-weight:500;
+      color:#111827;
+    }
+    .input-shell{
+      position:relative;
+    }
+    input{
+      width:100%;
+      padding:9px 10px 9px 34px;
+      font-size:0.8rem;
       border-radius:999px;
       border:1px solid #d1d5db;
-      background:white;
+      background:#f9fafb;
+      color:var(--text);
+      outline:none;
+      transition:border-color 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+    }
+    input::placeholder{
+      color:#9ca3af;
     }
     input:focus{
-      outline:none;
-      border-color:var(--primary);
-      box-shadow:0 0 0 3px rgba(37,99,235,0.25);
+      border-color:#2563eb;
+      box-shadow:0 0 0 1px rgba(37,99,235,0.55);
+      background:#ffffff;
+    }
+    .input-icon{
+      position:absolute;
+      left:10px;
+      top:50%;
+      transform:translateY(-50%);
+      font-size:0.9rem;
+      color:#9ca3af;
+    }
+    .row-compact{
+      display:flex;
+      gap:8px;
+      margin-top:6px;
+      flex-wrap:wrap;
+    }
+    .row-compact > div{
+      flex:1 1 0;
+      min-width:0;
     }
     button{
-      background:linear-gradient(135deg,var(--primary),#0077ff);
-      color:white;
+      border-radius:999px;
+      padding:9px 10px;
+      font-size:0.8rem;
+      font-weight:600;
       border:none;
       cursor:pointer;
-      font-weight:600;
-      letter-spacing:0.02em;
       display:inline-flex;
       align-items:center;
       justify-content:center;
       gap:6px;
+      transition:background 0.12s ease, transform 0.08s ease, box-shadow 0.12s ease;
+      white-space:nowrap;
     }
-    button:hover{background:linear-gradient(135deg,var(--primary-dark),#005fcc);}
-    .btn-secondary{background:#111827;color:white;}
-    .btn-secondary:hover{background:#030712;}
+    button:active{
+      transform:scale(0.97);
+      box-shadow:none;
+    }
+    .btn-primary{
+      background:linear-gradient(135deg,var(--primary),#1d7ef0);
+      color:#eff6ff;
+      box-shadow:0 10px 20px rgba(37,99,235,0.35);
+    }
+    .btn-primary:hover{
+      background:linear-gradient(135deg,var(--primary-dark),#2563eb);
+    }
+    .btn-ghost{
+      background:#f9fafb;
+      color:#111827;
+      border:1px solid #d1d5db;
+    }
+    .btn-ghost:hover{
+      background:#f3f4f6;
+    }
+    .btn-icon{
+      font-size:0.9rem;
+    }
+    .points-meta{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-top:4px;
+      font-size:0.7rem;
+      color:var(--muted);
+    }
+    .points-meta strong{
+      color:#111827;
+    }
+    .scroll-region{
+      flex:1;
+      overflow-y:auto;
+      padding-right:2px;
+      margin-top:4px;
+      margin-bottom:4px;
+    }
     .item{
       background:#f9fafb;
-      padding:10px 12px;
-      margin:6px 0;
-      border-radius:12px;
+      padding:9px 10px;
+      margin:4px 0;
+      border-radius:14px;
       display:flex;
       justify-content:space-between;
       align-items:flex-start;
       gap:8px;
       border:1px solid #e5e7eb;
     }
-    .item-main{flex:1;}
-    .item-actions{display:flex;flex-direction:column;gap:4px;}
-    .btn-sm{
-      padding:4px 10px;
+    .item-main{
+      flex:1;
+      min-width:0;
+    }
+    .item-title{
       font-size:0.8rem;
+      font-weight:500;
+    }
+    .item-meta{
+      font-size:0.7rem;
+      color:var(--muted);
+      margin-top:1px;
+    }
+    .item-actions{
+      display:flex;
+      flex-direction:column;
+      gap:3px;
+    }
+    .btn-chip{
+      padding:4px 8px;
+      font-size:0.7rem;
       border-radius:999px;
       border:none;
       cursor:pointer;
       white-space:nowrap;
     }
-    .remove{background:#e53935;color:white;}
-    .remove:hover{background:#b91c1c;}
-    .edit{background:#f59e0b;color:white;}
-    .edit:hover{background:#d97706;}
-    .navigate{background:var(--accent);color:white;}
-    .navigate:hover{background:#15803d;}
-    .hint{font-size:0.8rem;color:var(--muted);}
-    .row{display:flex;flex-wrap:wrap;gap:12px;}
-    .row>div{flex:1 1 0;min-width:0;}
-    .counter{font-size:0.8rem;color:var(--text);margin-top:4px;}
-    .counter span{font-weight:bold;}
-    .buttons-row{
+    .chip-edit{
+      background:#fef9c3;
+      color:#854d0e;
+      border:1px solid:#facc15;
+    }
+    .chip-delete{
+      background:#fee2e2;
+      color:#b91c1c;
+      border:1px solid:#fecaca;
+    }
+    .chip-nav{
+      background:#e0f2fe;
+      color:#075985;
+      border:1px solid:#bae6fd;
+    }
+    .footer-bar{
+      margin-top:6px;
       display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-      margin-top:10px;
-      margin-bottom:10px;
+      gap:8px;
     }
-    .buttons-row button{flex:1 1 0;min-width:180px;}
-    .app-header{
-      display:flex;
-      align-items:center;
-      gap:16px;
-      margin-bottom:10px;
-      flex-wrap:wrap;
-    }
-    .logo-wrap{
-      width:80px;
-      height:80px;
-      border-radius:20px;
-      overflow:hidden;
-      background:#e5f0ff;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      border:1px solid rgba(148,163,184,0.6);
-    }
-    .logo-wrap img{
-      width:100%;
-      height:100%;
-      object-fit:contain;
-    }
-    .app-subtitle{
-      font-size:0.9rem;
-      color:var(--muted);
+    .results-card{
       margin-top:4px;
-    }
-    @media (max-width:600px){
-      .box{padding:16px;border-radius:0;box-shadow:none;border:none;}
-      .row{flex-direction:column;}
-      .buttons-row button{min-width:100%;}
-      .logo-wrap{width:64px;height:64px;}
     }
   </style>
 </head>
 <body>
-<div class="box">
+<div class="app-shell">
+  <div class="status-bar">
+    <div>DROP NOW • RouteFlow</div>
+    <div>Today · Live</div>
+  </div>
+
   <div class="app-header">
-    <div class="logo-wrap">
-      <img src="dropnow_logo.jpg" alt="DROP NOW Logo" onerror="this.style.display='none'">
-    </div>
-    <div>
-      <h2>DROP NOW – סידור מסלול לשליחים</h2>
-      <div class="app-subtitle">
-        גרסת PWA – אפשר להתקין כמסך בית בטלפון.<br>
-        מסלול סגור: יציאה מנקודת בסיס וחזרה אליה, עם סידור אוטומטי של כל העצירות באמצע.
+    <div class="app-header-main">
+      <div class="logo-pill">
+        <img src="assets/logo.jpg" alt="DROP NOW logo">
+      </div>
+      <div class="app-title">
+        <div class="app-title-main">DROP NOW</div>
+        <div class="app-title-sub">Delivered Fast. Delivered Right.</div>
       </div>
     </div>
-  </div>
-
-  <p class="hint">הקלד נקודת יציאה/חזרה (מחסן / בית) ורשימת נקודות למסירה – המערכת תחשב מסלול סגור אופטימלי לפי זמן נסיעה.</p>
-
-  <label>נקודת יציאה וחזרה (חובה)</label>
-  <input id="start" placeholder="לדוגמה: הדרוף הנחלים 13, חולון">
-
-  <div class="row">
-    <div>
-      <label>הוסף נקודה ידנית</label>
-      <input id="pointInput" placeholder="לדוגמה: קניון חולון, חולון">
-      <button onclick="addPoint()">➕ הוסף נקודה</button>
-    </div>
-    <div>
-      <label>טעינת רשימה מקובץ (Excel / CSV)</label>
-      <input type="file" id="fileInput" accept=".csv,.xlsx,.xls">
-      <button class="btn-secondary" onclick="loadFromFile()">📂 טען רשימה מקובץ</button>
-      <p class="hint">עמודה ראשונה = כתובת / מקום בכל שורה. לדוגמה: "קניון חולון, חולון".</p>
+    <div class="app-badge">
+      <div class="app-badge-dot"></div>
+      BETA · Route Optimizer
     </div>
   </div>
 
-  <div class="counter">
-    מספר נקודות במסלול: <span id="pointsCount">0</span> (מומלץ עד 23–25 נקודות לחישוב אחד).
+  <div class="screen">
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title-wrap">
+          <div class="card-icon">📍</div>
+          <div>
+            <div class="card-title">נקודת יציאה וחזרה</div>
+            <div class="card-subtitle">מחסן / בית – התחלה וסיום של המסלול</div>
+          </div>
+        </div>
+        <div class="pill">מסלול סגור</div>
+      </div>
+
+      <div class="field-label">
+        <span>מיקום בסיס</span>
+        <span>חובה</span>
+      </div>
+      <div class="input-shell">
+        <span class="input-icon">🏠</span>
+        <input id="start" placeholder="לדוגמה: ההדר הנחלים 13, חולון" />
+      </div>
+    </div>
+
+    <div class="card" style="flex:1;display:flex;flex-direction:column;">
+      <div class="card-header">
+        <div class="card-title-wrap">
+          <div class="card-icon">📦</div>
+          <div>
+            <div class="card-title">נקודות במסלול</div>
+            <div class="card-subtitle">מוסיפים נקודות ידנית או מקובץ אקסל / CSV</div>
+          </div>
+        </div>
+        <div class="pill"><span id="pointsCount">0</span> עצירות היום</div>
+      </div>
+
+      <div class="row-compact">
+        <div>
+          <div class="field-label">
+            <span>הוספת נקודה</span>
+          </div>
+          <div class="input-shell">
+            <span class="input-icon">📌</span>
+            <input id="pointInput" placeholder="לדוגמה: קניון חולון, חולון" />
+          </div>
+        </div>
+      </div>
+
+      <div class="row-compact">
+        <button class="btn-primary" onclick="addPoint()">
+          <span class="btn-icon">➕</span>
+          הוסף נקודה
+        </button>
+        <button class="btn-ghost" onclick="document.getElementById('fileInput').click()">
+          <span class="btn-icon">📂</span>
+          טעינת קובץ
+        </button>
+        <input type="file" id="fileInput" accept=".csv,.xlsx,.xls" style="display:none;" onchange="loadFromFile()" />
+      </div>
+
+      <div class="points-meta">
+        <div>ניתן לייבא רשימה מאקסל (עמודה ראשונה = כתובת).</div>
+      </div>
+
+      <div class="scroll-region" id="pointsList"></div>
+
+      <div class="footer-bar">
+        <button class="btn-primary" style="flex:1;" onclick="calc()">
+          <span class="btn-icon">🚀</span>
+          חשב מסלול
+        </button>
+        <button class="btn-ghost" style="flex:1;" onclick="exportCsv()">
+          <span class="btn-icon">💾</span>
+          ייצוא רשימה
+        </button>
+      </div>
+    </div>
+
+    <div class="card results-card">
+      <div class="card-header">
+        <div class="card-title-wrap">
+          <div class="card-icon">🧭</div>
+          <div>
+            <div class="card-title">תוצאות המסלול</div>
+            <div class="card-subtitle">סדר הנסיעה וזמני נסיעה בין עצירה לעצירה</div>
+          </div>
+        </div>
+        <div class="pill">DRIVING · Google Maps</div>
+      </div>
+      <div class="scroll-region" id="results">
+        <div class="card-subtitle">
+          עדיין אין מסלול מחושב. הוסף נקודות ולחץ על "חשב מסלול".
+        </div>
+      </div>
+    </div>
+
   </div>
-
-  <div class="hint">אפשר לערוך או למחוק כל נקודה לפני חישוב המסלול.</div>
-
-  <div id="pointsList"></div>
-
-  <div class="buttons-row">
-    <button onclick="calc()">📍 סדר מסלול סגור לפי זמן נסיעה</button>
-    <button class="btn-secondary" onclick="exportCsv()">💾 ייצוא רשימה לקובץ CSV</button>
-  </div>
-
-  <h3>תוצאות המסלול (סיבוב מלא):</h3>
-  <div id="results"></div>
 </div>
 
-<!-- Google Maps + Places -->
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAFcjjQ8OuE28K3SYA-aQe2hm04Gsru7Fk&libraries=places"></script>
-<!-- קובץ EXCEL -->
 <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
-
 <script>
   let stops = [];
   let directionsService;
 
   function updateCounter() {
-    document.getElementById("pointsCount").textContent = stops.length;
+    const span = document.getElementById("pointsCount");
+    if (span) span.textContent = stops.length;
   }
 
   window.onload = function() {
@@ -214,48 +492,50 @@
 
     directionsService = new google.maps.DirectionsService();
 
-    new google.maps.places.Autocomplete(
-      startEl,
-      { types:["geocode","establishment"], componentRestrictions:{ country:"il" } }
-    );
-    new google.maps.places.Autocomplete(
-      pointEl,
-      { types:["geocode","establishment"], componentRestrictions:{ country:"il" } }
-    );
+    if (startEl) {
+      new google.maps.places.Autocomplete(
+        startEl,
+        { types:["geocode","establishment"], componentRestrictions:{ country:"il" } }
+      );
+    }
+    if (pointEl) {
+      new google.maps.places.Autocomplete(
+        pointEl,
+        { types:["geocode","establishment"], componentRestrictions:{ country:"il" } }
+      );
+    }
 
     updateCounter();
-
-    // רישום Service Worker ל-PWA
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("sw.js").catch(function(e){
-        console.log("SW registration failed:", e);
-      });
-    }
   };
 
   function addPoint() {
-    const val = document.getElementById("pointInput").value.trim();
+    const input = document.getElementById("pointInput");
+    const val = input.value.trim();
     if (!val) return;
     stops.push(val);
-    document.getElementById("pointInput").value = "";
+    input.value = "";
     renderStops();
   }
 
   function renderStops() {
+    const container = document.getElementById("pointsList");
+    if (!container) return;
     let html = "";
     for (let i = 0; i < stops.length; i++) {
-      html += '<div class="item">' +
-                '<div class="item-main">' +
-                  '<div><strong>' + stops[i] + '</strong></div>' +
-                  '<div class="hint">נקודה #' + (i+1) + '</div>' +
-                '</div>' +
-                '<div class="item-actions">' +
-                  '<button class="btn-sm edit" onclick="editPoint(' + i + ')">✏ ערוך</button>' +
-                  '<button class="btn-sm remove" onclick="removePoint(' + i + ')">🗑 מחק</button>' +
-                '</div>' +
-              '</div>';
+      html += `
+        <div class="item">
+          <div class="item-main">
+            <div class="item-title">${stops[i]}</div>
+            <div class="item-meta">נקודה #${i+1}</div>
+          </div>
+          <div class="item-actions">
+            <button class="btn-chip chip-edit" onclick="editPoint(${i})">עריכה</button>
+            <button class="btn-chip chip-delete" onclick="removePoint(${i})">מחיקה</button>
+          </div>
+        </div>
+      `;
     }
-    document.getElementById("pointsList").innerHTML = html;
+    container.innerHTML = html || '<div class="card-subtitle">אין נקודות במסלול. הוסף נקודה ראשונה.</div>';
     updateCounter();
   }
 
@@ -363,16 +643,20 @@
       return;
     }
     if (stops.length > 23) {
-      alert("להתנהגות הכי טובה של Google מומלץ עד כ-23 נקודות למסלול אחד. חלק את היום לכמה קבוצות.");
+      alert("מומלץ עד כ-23 נקודות לחישוב אחד – חלק את היום לכמה קבוצות.");
       return;
     }
 
-    const waypoints = stops.map(s => ({ location: s, stopover: true }));
+    const waypoints = stops.map(s => { return { location: s, stopover: true }; });
+
+    if (!directionsService) {
+      directionsService = new google.maps.DirectionsService();
+    }
 
     directionsService.route(
       {
         origin: origin,
-        destination: origin, // חזרה לנקודת ההתחלה
+        destination: origin,
         waypoints: waypoints,
         optimizeWaypoints: true,
         travelMode: google.maps.TravelMode.DRIVING
@@ -418,21 +702,23 @@
             line = "זמן נסיעה מהקודם: לא ידוע";
           }
 
-          out += '<div class="item">' +
-                    '<div class="item-main">' +
-                      '<div><strong>' + s.name + '</strong></div>' +
-                      '<div class="hint">' + line + '</div>' +
-                    '</div>' +
-                    '<div class="item-actions">' +
-                      (i > 0
-                        ? '<button class="btn-sm navigate" onclick="goTo(\'' + encodeURIComponent(s.name) + '\')">נווט</button>'
-                        : ''
-                      ) +
-                    '</div>' +
-                 '</div>';
+          out += `
+            <div class="item">
+              <div class="item-main">
+                <div class="item-title">${s.name}</div>
+                <div class="item-meta">${line}</div>
+              </div>
+              <div class="item-actions">
+                ${i > 0 ? '<button class="btn-chip chip-nav" onclick="goTo(\'' + encodeURIComponent(s.name) + '\')">נווט</button>' : ''}
+              </div>
+            </div>
+          `;
         }
 
-        document.getElementById("results").innerHTML = out;
+        const resultsEl = document.getElementById("results");
+        if (resultsEl) {
+          resultsEl.innerHTML = out;
+        }
       }
     );
   }
