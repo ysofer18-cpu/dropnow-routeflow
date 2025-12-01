@@ -1,0 +1,15 @@
+{
+  "name": "DROP NOW – RouteFlow",
+  "short_name": "DropNow",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0b51c5",
+  "icons": [
+    {
+      "src": "logo.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg"
+    }
+  ]
+}
